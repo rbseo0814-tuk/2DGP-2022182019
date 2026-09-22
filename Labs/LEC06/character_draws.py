@@ -10,6 +10,9 @@ character = load_image(os.path.join(script_dir, 'character.png'))
 
 def move_circle():
     print("circle")
+    clear_canvas()
+    character.draw(400, 300)
+    update_canvas()
     pass
 
 def move_rectangle():
