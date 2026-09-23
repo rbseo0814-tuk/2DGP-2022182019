@@ -25,6 +25,10 @@ def draw_character(x, y):
     update_canvas()
     delay(0.01)
 
+def move_top():
+    for x in range(50, 751, 5):
+        draw_character(x, 550)
+
 def move_rectangle():
     move_top()
     move_right()
