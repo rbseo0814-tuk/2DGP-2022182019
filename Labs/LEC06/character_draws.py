@@ -43,6 +43,7 @@ def move_triangle():
         y = 50 + (x - 50) * (500 / 700)
         draw_character(x, y)
 
+    for x in range(750, 49, -5):
 def draw_character(x, y):
     clear_canvas()
     character.draw(x, y)
