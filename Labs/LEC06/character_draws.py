@@ -39,7 +39,8 @@ def move_rectangle():
     move_left()
 
 def move_triangle():
-    print('triangle')
+    for x in range(50, 751, 5):
+        
 
 def draw_character(x, y):
     clear_canvas()
