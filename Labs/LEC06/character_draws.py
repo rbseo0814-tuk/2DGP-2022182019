@@ -7,8 +7,6 @@ character = load_image('character.png')
 clear_canvas()
 character.draw(400, 300)
 update_canvas()
-delay(1)
-close_canvas()
 
 def move_circle():
     for degree in range(360):
@@ -22,7 +20,10 @@ def move_circle():
         delay(0.01)
 
 def move_rectangle():
-    print('rectangle')
+    move_top()
+    move_right()
+    move_bottom()
+    move_left()
 
 def move_triangle():
     print('triangle')
