@@ -37,6 +37,10 @@ def move_bottom():
     for x in range(750, 49, -5):
         draw_character(x, 50)
 
+def move_left():
+    for y in range(50, 551, 5):
+        draw_character(50, y)
+
 def move_rectangle():
     move_top()
     move_right()
