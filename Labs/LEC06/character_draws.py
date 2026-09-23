@@ -19,6 +19,12 @@ def move_circle():
         update_canvas()
         delay(0.01)
 
+def draw_character(x, y):
+    clear_canvas()
+    character.draw(x, y)
+    update_canvas()
+    delay(0.01)
+
 def move_rectangle():
     move_top()
     move_right()
