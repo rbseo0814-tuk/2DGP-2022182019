@@ -1,3 +1,5 @@
+from pico2d import *
+
 def move_circle():
     print('circle')
 
