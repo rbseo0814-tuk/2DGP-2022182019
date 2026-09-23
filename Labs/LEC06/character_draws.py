@@ -11,7 +11,8 @@ delay(1)
 close_canvas()
 
 def move_circle():
-    print('circle')
+    for degree in range(360):
+        
 
 def move_rectangle():
     print('rectangle')
