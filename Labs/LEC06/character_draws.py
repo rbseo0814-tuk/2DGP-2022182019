@@ -47,6 +47,9 @@ def move_rectangle():
     move_bottom()
     move_left()
 
+def move_line(x1, y1, x2, y2, steps=140):
+    
+
 def move_triangle():
     move_one()
     move_two()
