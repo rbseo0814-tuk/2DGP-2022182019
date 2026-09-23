@@ -16,6 +16,11 @@ def move_circle():
         x = 400 + 200 * math.cos(theta)
         y = 300 + 200 * math.sin(theta)
 
+        clear_canvas()
+        character.draw(x, y)
+        update_canvas()
+        delay(0.01)
+
 def move_rectangle():
     print('rectangle')
 
