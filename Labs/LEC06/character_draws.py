@@ -5,7 +5,7 @@ def move_rectangle():
     print('rectangle')
 
 def move_triangle():
-    pass
+    print('triangle')
 
 while True:
     move_circle()
