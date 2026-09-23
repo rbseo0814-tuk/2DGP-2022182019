@@ -20,7 +20,12 @@ def move_top():
     for x in range(50,751,5):
         draw_character(x, 550)
 
+def move_right():
+    for y in range(550, 49, -5):
+        draw_character(750, y)
+
 def move_rectangle():
+    move_top()
     move_right()
     move_bottom()
     move_left()
