@@ -4,5 +4,8 @@ def move_circle():
 def move_rectangle():
     pass
 
+def move_triangle():
+    pass
+
 while True:
     pass
