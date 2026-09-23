@@ -60,7 +60,9 @@ def move_one():
 def move_two():
     move_line(600, 550 - 400 * math.sqrt(3) / 2, 200, 550 - 400 * math.sqrt(3) / 2)
 
+def move_three():
 
+    
 def move_triangle():
     move_one()
     move_two()
