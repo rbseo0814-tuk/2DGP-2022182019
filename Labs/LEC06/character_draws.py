@@ -1,5 +1,5 @@
 def move_circle():
-    pass
+    print('circle')
 
 def move_rectangle():
     pass
