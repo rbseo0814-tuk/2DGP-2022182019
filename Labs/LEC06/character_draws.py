@@ -48,7 +48,9 @@ def move_rectangle():
     move_left()
 
 def move_triangle():
-    print('triangle')
+    move_one()
+    move_two()
+    move_three()
 
 while True:
     move_circle()
