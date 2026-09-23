@@ -2,7 +2,7 @@ def move_circle():
     print('circle')
 
 def move_rectangle():
-    pass
+    print('rectangle')
 
 def move_triangle():
     pass
