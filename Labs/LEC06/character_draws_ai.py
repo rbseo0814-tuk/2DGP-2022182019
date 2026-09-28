@@ -5,11 +5,13 @@ import math
 open_canvas(800, 600)
 character = load_image('character.png')
 
+DELAY_TIME = 0.01
+
 def draw_character(x, y):
     clear_canvas()
     character.draw(x, y)
     update_canvas()
-    delay(0.01)
+    delay(DELAY_TIME)
 
 def move_circle():
     for degree in range(360):
