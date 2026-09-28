@@ -40,6 +40,10 @@ def move_rectangle():
     move_bottom()
     move_left()
 
+def move_triangle():
+    for x in range(50, 751, 5):
+        pass
+
 while True:
     move_circle()
     move_rectangle()
