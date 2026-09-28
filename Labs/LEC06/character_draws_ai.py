@@ -8,6 +8,7 @@ character = load_image('character.png')
 def draw_character(x, y):
     clear_canvas()
     character.draw(x, y)
+    update_canvas()
 
 while True:
     pass
