@@ -46,6 +46,7 @@ def move_triangle():
         draw_character(x, y)
 
     for x in range(750, 49, -5):
+        y = 550 - (x - 50) * (500 / 700)
         pass
 
 while True:
