@@ -15,6 +15,7 @@ def move_circle():
     for degree in range(360):
         theta = math.radians(degree)
         x = 400 + 200 * math.cos(theta)
+        y = 300 + 200 * math.sin(theta)
         pass
 
 while True:
