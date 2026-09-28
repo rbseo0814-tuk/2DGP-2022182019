@@ -9,6 +9,7 @@ def draw_character(x, y):
     clear_canvas()
     character.draw(x, y)
     update_canvas()
+    delay(0.01)
 
 while True:
     pass
