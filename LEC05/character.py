@@ -1,17 +1,24 @@
-from pico2d import *
+from pico2d import*
+import math
 
+open_canvas(900, 600)
+character = load_image('character.png')
 
-open_canvas(800, 600)
+cx = 450
+cy = 300
+r = 200
+theta = 0
 
-# 여기를 채우시오.
+while (1):
+    clear_canvas()
+    x = cx + r * math.cos(theta)
+    y = cy + r * math.sin(theta)
 
+    character.draw(x, y)
+    update_canvas()
 
-
-
-
-
-
-delay(2)
+    theta += 0.05
+    delay(0.01)
+    
 
 close_canvas()
-

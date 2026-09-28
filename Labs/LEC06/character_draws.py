@@ -1,9 +1,12 @@
-# 실습 과제 진행
 from pico2d import *
 import math
 
 open_canvas(800, 600)
 character = load_image('character.png')
+
+clear_canvas()
+character.draw(400, 300)
+update_canvas()
 
 def move_circle():
     for degree in range(360):
@@ -16,8 +19,14 @@ def move_circle():
         update_canvas()
         delay(0.01)
 
+def draw_character(x, y):
+    clear_canvas()
+    character.draw(x, y)
+    update_canvas()
+    delay(0.01)
+
 def move_top():
-    for x in range(50,751,5):
+    for x in range(50, 751, 5):
         draw_character(x, 550)
 
 def move_right():
@@ -38,19 +47,26 @@ def move_rectangle():
     move_bottom()
     move_left()
 
-def move_triangle():
-    for x in range(50, 751, 5):
-        y = 50 + (x - 50) * (500 / 700)
+def move_line(x1, y1, x2, y2, steps=140):
+    for i in range(steps + 1):
+        t = i / steps
+        x = x1 + (x2 - x1) * t
+        y = y1 + (y2 - y1) * t
         draw_character(x, y)
 
-    for x in range(750, 49, -5):
-        y = 550 - (x - 50) * (500 / 700)
-        draw_character(x, y)
-def draw_character(x, y):
-    clear_canvas()
-    character.draw(x, y)
-    update_canvas()
-    delay(0.01)
+def move_one():
+    move_line(400, 550, 600, 550 - 400 * math.sqrt(3) / 2)
+
+def move_two():
+    move_line(600, 550 - 400 * math.sqrt(3) / 2, 200, 550 - 400 * math.sqrt(3) / 2)
+
+def move_three():
+    move_line(200, 550 - 400 * math.sqrt(3) / 2, 400, 550)
+
+def move_triangle():
+    move_one()
+    move_two()
+    move_three()
 
 while True:
     move_circle()
