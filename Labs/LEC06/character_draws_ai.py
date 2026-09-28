@@ -16,7 +16,7 @@ def move_circle():
         theta = math.radians(degree)
         x = 400 + 200 * math.cos(theta)
         y = 300 + 200 * math.sin(theta)
-        pass
+        draw_character(x, y)
 
 while True:
     pass
