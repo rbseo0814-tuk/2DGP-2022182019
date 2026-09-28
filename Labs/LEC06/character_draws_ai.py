@@ -42,3 +42,4 @@ def move_rectangle():
 
 while True:
     move_circle()
+    move_rectangle()
