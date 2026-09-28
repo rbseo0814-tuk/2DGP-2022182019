@@ -9,12 +9,14 @@ DELAY_TIME = 0.01
 CENTER_X, CENTER_Y = 400, 300
 RADIUS = 200
 
+# 캔버스를 지우고 (x, y)에 캐릭터를 그림
 def draw_character(x, y):
     clear_canvas()
     character.draw(x, y)
     update_canvas()
     delay(DELAY_TIME)
 
+# 중심을 기준으로 원을 그리며 이동
 def move_circle():
     for degree in range(360):
         theta = math.radians(degree)
@@ -38,12 +40,14 @@ def move_left():
     for y in range(50, 551, 5):
         draw_character(50, y)
 
+# 상 -> 우 -> 하 -> 좌 순서로 사각형 이동
 def move_rectangle():
     move_top()
     move_right()
     move_bottom()
     move_left()
 
+# 대각선 두 변을 따라 삼각형 이동
 def move_triangle():
     for x in range(50, 751, 5):
         y = 50 + (x - 50) * (500 / 700)
