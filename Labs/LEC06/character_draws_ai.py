@@ -42,6 +42,7 @@ def move_rectangle():
 
 def move_triangle():
     for x in range(50, 751, 5):
+        y = 50 + (x - 50) * (500 / 700)
         pass
 
 while True:
