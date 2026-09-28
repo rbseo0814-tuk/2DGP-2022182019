@@ -13,6 +13,7 @@ def draw_character(x, y):
 
 def move_circle():
     for degree in range(360):
+        theta = math.radians(degree)
         pass
 
 while True:
