@@ -19,4 +19,4 @@ def move_circle():
         draw_character(x, y)
 
 while True:
-    pass
+    move_circle()
