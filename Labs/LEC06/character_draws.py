@@ -8,17 +8,21 @@ def draw_circle():
     print('CIRCLE')
     for deg in range(0,360,5):
         rad = math.radians(deg)
-        x = 400+ 200 * math.cos(rad)
-        y= 300 + 200 * math.sin(rad)
-        clear_canvas()
-        character.draw(x,y)
-        update_canvas()
-        delay(0.1)
+        x = 400 + 200 * math.cos(rad)
+        y = 300 + 200 * math.sin(rad)
+        draw_character(x, y)
     pass
 
 def draw_top():
     print('TOP')
-    pass
+    for x in range(50, 750, 5):
+        draw_character(x, 550)
+
+def draw_character(x, y):
+    clear_canvas()
+    character.draw(x, y)
+    update_canvas()
+    delay(0.1)
 
 def draw_right():
     print('RIGHT')
@@ -45,7 +49,7 @@ def draw_triangle():
     pass
 
 while True:
-    # draw_circle()
+    draw_circle()
     draw_rectangle()
     draw_triangle()
     break
