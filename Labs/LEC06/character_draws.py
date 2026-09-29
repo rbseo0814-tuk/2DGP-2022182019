@@ -16,8 +16,28 @@ def draw_circle():
         delay(0.1)
     pass
 
+def draw_top():
+    print('TOP')
+    pass
+
+def draw_right():
+    print('RIGHT')
+    pass
+
+def draw_bottom():
+    print('BOTTOM')
+    pass
+
+def draw_left():
+    print('LEFT')
+    pass
+
 def draw_rectangle():
     print('RECTANGLE')
+    draw_top()
+    draw_right()
+    draw_bottom()
+    draw_left()
     pass
 
 def draw_triangle():
@@ -25,7 +45,8 @@ def draw_triangle():
     pass
 
 while True:
-    draw_circle()
+    # draw_circle()
     draw_rectangle()
     draw_triangle()
+    break
     pass
