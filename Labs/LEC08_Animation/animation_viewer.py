@@ -1,11 +1,30 @@
 """
-Drill #8. 애니메이션 뷰어
+Drill #8. 애니메이션 뷰어 (AI 이용한 개발)
 
-10단계: clip_draw(..., x, y)는 프레임의 '중심'을 (x, y)에 맞춘다.
-        그런데 jump 애니메이션처럼 프레임마다 높이가 크게 다르면, 중심을
-        맞출 때 발 위치가 위아래로 흔들려 보인다(웅크릴수록 발이 뜸).
-        대신 '바닥선(baseline)'을 고정하고 그 위에 발이 닿도록 그리면
-        캐릭터가 제자리에 서 있는 것처럼 자연스럽다.
+[에셋]
+- 수업 자료 폴더에 제공된 SamuraiSheet.png를 그대로 사용한다.
+- build_manifest.py가 알파 채널을 분석해 각 동작(행)에서 실제 그림이 있는
+  영역만 타이트하게 잘라내 samurai_manifest.json을 만든다 (자세한 과정은
+  build_manifest.py와 README.md 참고).
+
+[요구사항 대응]
+- 최소 4종 애니메이션: walk / run / jump(구르기) / attack (ANIM_ORDER)
+- 화면 절반 이상으로 확대: TARGET_HEIGHT_RATIO(=0.5)만큼 항상 확대해서 그림
+- 화면 중앙 재생: 가로는 CANVAS_W//2, 세로는 baseline_y로 고정
+- 5회 반복 후 1초 정지, 이후 다음 애니메이션으로 무한 순환
+  (Animation 클래스의 loop_repeat / pause_time / finished 참고)
+
+[보너스 - 명시 사항]
+1) "프레임마다 크기가 달라지는 복잡한 Sprite Sheet"
+   -> samurai_manifest.json의 각 프레임은 균일한 그리드가 아니라, 알파 채널
+      기준으로 실제 그림 크기(w, h)를 각각 계산해 저장한 값이다. 특히 jump
+      애니메이션은 프레임마다 세로 크기가 80~63px까지 실제로 달라진다.
+      Animation.__init__()은 이 서로 다른 (w, h)를 그대로 받아 프레임별로
+      확대 비율을 따로 계산하며, draw()는 baseline_y 기준으로 높이가 달라도
+      발 위치가 흔들리지 않게 그린다.
+2) "애니메이션별 프레임 수가 서로 다른 경우 지원"
+   -> walk=8, run=8, jump=12, attack=6 으로 프레임 개수가 서로 다르다.
+      Animation은 frames 리스트의 길이를 그대로 쓰므로 개수가 몇 개든 동작한다.
 """
 import json
 from itertools import cycle
