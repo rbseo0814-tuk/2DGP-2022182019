@@ -1,8 +1,8 @@
 """
 Drill #8. 애니메이션 뷰어
 
-7단계: walk 하나만 재생하던 것을, walk -> run -> jump -> attack 순서로
-       바꿔가며 무한 반복하도록 확장한다 (요구사항: 최소 4종, 무한 순환).
+8단계: 지금까지 while True로 무한히 돌기만 했고 빠져나올 방법이 없었다.
+       창 닫기(X 버튼) 또는 ESC 키를 누르면 정상 종료되도록 이벤트 처리를 더한다.
 """
 import json
 from itertools import cycle
@@ -88,6 +88,16 @@ class Animation:
         image.clip_draw(left, bottom, w, h, cx, cy, draw_w, draw_h)
 
 
+def handle_events():
+    """창 닫기 버튼 또는 ESC 키가 눌리면 False를 반환해 메인 루프를 끝낸다."""
+    for event in get_events():
+        if event.type == SDL_QUIT:
+            return False
+        if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            return False
+    return True
+
+
 def main():
     open_canvas(CANVAS_W, CANVAS_H)
 
@@ -104,7 +114,10 @@ def main():
 
     current = make_animation(next(anim_cycle))
 
-    while True:
+    running = True
+    while running:
+        running = handle_events()
+
         current.update(0.01)
         if current.finished:
             current = make_animation(next(anim_cycle))
