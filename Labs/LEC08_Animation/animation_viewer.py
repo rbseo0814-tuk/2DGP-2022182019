@@ -1,8 +1,8 @@
 """
 Drill #8. 애니메이션 뷰어
 
-8단계: 지금까지 while True로 무한히 돌기만 했고 빠져나올 방법이 없었다.
-       창 닫기(X 버튼) 또는 ESC 키를 누르면 정상 종료되도록 이벤트 처리를 더한다.
+9단계: 지금 어떤 동작이 재생 중인지 화면 좌상단에 글자로 표시한다.
+       (채점/시연할 때 어떤 애니메이션인지 바로 알아볼 수 있도록)
 """
 import json
 from itertools import cycle
@@ -22,6 +22,14 @@ PAUSE_TIME = 1.0           # 반복 후 정지 시간(초)
 
 # 최소 4종 요구사항: 걷기/뛰기/구르기(점프)/공격 순서로 무한 반복한다.
 ANIM_ORDER = ["walk", "run", "jump", "attack"]
+
+FONT_PATH = "C:/Windows/Fonts/malgun.ttf"
+LABEL_TEXT = {
+    "walk": "걷기 (walk)",
+    "run": "달리기 (run)",
+    "jump": "구르기 (jump)",
+    "attack": "공격 (attack)",
+}
 
 
 def load_manifest():
@@ -105,6 +113,7 @@ def main():
     manifest = load_manifest()
     sheet_h = manifest["sheet_size"][1]
     target_height = CANVAS_H * TARGET_HEIGHT_RATIO
+    font = load_font(FONT_PATH, 24)
 
     order = [name for name in ANIM_ORDER if name in manifest["animations"]]
     anim_cycle = cycle(order)
@@ -112,7 +121,8 @@ def main():
     def make_animation(name):
         return Animation(manifest["animations"][name], sheet_h, target_height)
 
-    current = make_animation(next(anim_cycle))
+    current_name = next(anim_cycle)
+    current = make_animation(current_name)
 
     running = True
     while running:
@@ -120,10 +130,12 @@ def main():
 
         current.update(0.01)
         if current.finished:
-            current = make_animation(next(anim_cycle))
+            current_name = next(anim_cycle)
+            current = make_animation(current_name)
 
         clear_canvas()
         current.draw(sheet, CANVAS_W // 2, CANVAS_H // 2)
+        font.draw(20, CANVAS_H - 36, f"현재 동작: {LABEL_TEXT[current_name]}", (20, 20, 20))
         update_canvas()
         delay(0.01)
 
