@@ -1,11 +1,11 @@
 """
 Drill #8. 애니메이션 뷰어
 
-6단계: 요구사항인 "5회 반복 후 1초 정지"를 Animation 클래스에 추가한다.
-       지정한 횟수만큼 다 돌면 스스로 '정지 상태'가 되고, finished 플래그로
-       바깥(main)에 알려준다.
+7단계: walk 하나만 재생하던 것을, walk -> run -> jump -> attack 순서로
+       바꿔가며 무한 반복하도록 확장한다 (요구사항: 최소 4종, 무한 순환).
 """
 import json
+from itertools import cycle
 from pathlib import Path
 
 from pico2d import *
@@ -19,6 +19,9 @@ TARGET_HEIGHT_RATIO = 0.5  # 캐릭터 표시 높이 = 화면 세로 * 이 값
 FRAME_TIME = 0.09          # 한 프레임을 보여주는 시간(초)
 LOOP_REPEAT = 5            # 한 애니메이션을 몇 번 반복한 뒤 쉴지
 PAUSE_TIME = 1.0           # 반복 후 정지 시간(초)
+
+# 최소 4종 요구사항: 걷기/뛰기/구르기(점프)/공격 순서로 무한 반복한다.
+ANIM_ORDER = ["walk", "run", "jump", "attack"]
 
 
 def load_manifest():
@@ -93,14 +96,21 @@ def main():
     sheet_h = manifest["sheet_size"][1]
     target_height = CANVAS_H * TARGET_HEIGHT_RATIO
 
-    walk = Animation(manifest["animations"]["walk"], sheet_h, target_height)
+    order = [name for name in ANIM_ORDER if name in manifest["animations"]]
+    anim_cycle = cycle(order)
 
-    # walk가 5회 반복 + 1초 정지까지 끝낼 때까지만 재생 (다음 단계에서 무한 순환으로 확장)
-    while not walk.finished:
-        walk.update(0.01)
+    def make_animation(name):
+        return Animation(manifest["animations"][name], sheet_h, target_height)
+
+    current = make_animation(next(anim_cycle))
+
+    while True:
+        current.update(0.01)
+        if current.finished:
+            current = make_animation(next(anim_cycle))
 
         clear_canvas()
-        walk.draw(sheet, CANVAS_W // 2, CANVAS_H // 2)
+        current.draw(sheet, CANVAS_W // 2, CANVAS_H // 2)
         update_canvas()
         delay(0.01)
 
