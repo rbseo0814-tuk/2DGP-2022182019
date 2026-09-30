@@ -27,9 +27,11 @@ Drill #8. 애니메이션 뷰어 (AI 이용한 개발)
       Animation은 frames 리스트의 길이를 그대로 쓰므로 개수가 몇 개든 동작한다.
 """
 import json
+import os
 from itertools import cycle
 from pathlib import Path
 
+import pico2d
 from pico2d import *
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -56,7 +58,10 @@ FRAME_TIME_BY_ANIM = {
     "attack": 0.08,  # 원래 0.045였는데 너무 빨라 보여서 늦췄다
 }
 
-FONT_PATH = "C:/Windows/Fonts/malgun.ttf"
+# 라벨이 영문뿐이라 굳이 한글 폰트가 필요하진 않지만, 특정 OS/설치 환경에만
+# 있는 "C:/Windows/Fonts/..." 같은 절대경로 대신 pico2d 패키지에 이미 들어있는
+# 폰트를 써서 pico2d만 설치돼 있으면 어떤 컴퓨터에서도 그대로 동작하게 한다.
+FONT_PATH = os.path.join(os.path.dirname(pico2d.__file__), "data", "ConsolaMalgun.ttf")
 
 
 def load_manifest():
