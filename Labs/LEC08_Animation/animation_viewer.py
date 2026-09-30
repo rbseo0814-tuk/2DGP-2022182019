@@ -53,16 +53,10 @@ FRAME_TIME_BY_ANIM = {
     "walk": 0.10,
     "run": 0.07,
     "jump": 0.06,
-    "attack": 0.045,
+    "attack": 0.08,  # 원래 0.045였는데 너무 빨라 보여서 늦췄다
 }
 
 FONT_PATH = "C:/Windows/Fonts/malgun.ttf"
-LABEL_TEXT = {
-    "walk": "걷기 (walk)",
-    "run": "달리기 (run)",
-    "jump": "구르기 (jump)",
-    "attack": "공격 (attack)",
-}
 
 
 def load_manifest():
@@ -179,7 +173,7 @@ def main():
 
         clear_canvas()
         current.draw(sheet, CANVAS_W // 2, baseline_y)
-        font.draw(20, CANVAS_H - 36, f"현재 동작: {LABEL_TEXT[current_name]}", (20, 20, 20))
+        font.draw(20, CANVAS_H - 36, current_name, (20, 20, 20))
         update_canvas()
         delay(0.01)
 
