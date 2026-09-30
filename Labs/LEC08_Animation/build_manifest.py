@@ -14,6 +14,15 @@ BASE_DIR = Path(__file__).resolve().parent
 SHEET_PATH = BASE_DIR / "SamuraiSheet.png"
 ALPHA_THRESHOLD = 10  # 이 값보다 큰 알파만 "그림이 있다"고 본다
 
+# 일부 동작(칼을 휘두르는 공격)에는 캐릭터 그림 옆에 작은 '궤적(잔상)' 표시가
+# 별도의 투명 조각으로 떨어져 있다. 알파 채널만 보면 이것도 하나의 "프레임"으로
+# 잘못 검출되므로, 실제로 크롭 이미지를 눈으로 확인한 뒤 제외 목록에 적어둔다.
+# (row 인덱스, 그 행에서 몇 번째로 검출된 조각인지) -> 캐릭터가 아니라 이펙트임
+EXCLUDE_FRAGMENTS = {
+    4: [5],  # attack 동작 5번째칸과 6번째칸 사이의 얇은 곡선 이펙트
+    5: [3],  # attack 동작 3번째칸과 4번째칸 사이의 작은 이펙트
+}
+
 
 def find_bands(has_content):
     """1차원 불리언 배열에서 True가 연속되는 구간(시작,끝)의 목록을 반환."""
@@ -51,9 +60,12 @@ def main():
     print(f"감지된 행(애니메이션) 개수: {len(row_bands)}")
     for i, (y0, y1) in enumerate(row_bands):
         frames = find_frames_in_row(content, y0, y1)
-        widths = [x1 - x0 for x0, x1 in frames]
+        excluded = EXCLUDE_FRAGMENTS.get(i, [])
+        kept = [f for j, f in enumerate(frames) if j not in excluded]
+        widths = [x1 - x0 for x0, x1 in kept]
+        note = f"  (이펙트 조각 {excluded}개 제외)" if excluded else ""
         print(f"  row {i}: y=({y0},{y1}) height={y1 - y0}  "
-              f"프레임 수={len(frames)}  가로폭들={widths}")
+              f"프레임 수={len(kept)}  가로폭들={widths}{note}")
 
 
 if __name__ == "__main__":
