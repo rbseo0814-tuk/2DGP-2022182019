@@ -1,8 +1,9 @@
 """
 Drill #8. 애니메이션 뷰어
 
-3단계: walk 애니메이션의 프레임을 순서대로 계속 바꿔가며 재생해본다.
-       (아직 확대·중앙정렬·반복횟수 제한은 없음 - 뼈대만 확인)
+4단계: 캐릭터가 화면 대비 너무 작으므로, 항상 화면 세로의 절반 높이가
+       되도록 확대해서 그린다. 프레임마다 원본 크기가 달라도(가변 크기
+       스프라이트) 세로 크기를 기준으로 비율을 맞추면 자연스럽게 보인다.
 """
 import json
 from pathlib import Path
@@ -14,6 +15,7 @@ SHEET_PATH = BASE_DIR / "SamuraiSheet.png"
 MANIFEST_PATH = BASE_DIR / "samurai_manifest.json"
 
 CANVAS_W, CANVAS_H = 960, 640
+TARGET_HEIGHT_RATIO = 0.5  # 캐릭터 표시 높이 = 화면 세로 * 이 값
 
 
 def load_manifest():
@@ -43,12 +45,20 @@ def main():
     walk_frames = manifest["animations"]["walk"]
     rects = [to_pico_rect(f, sheet_h) for f in walk_frames]
 
+    target_height = CANVAS_H * TARGET_HEIGHT_RATIO
+    # 프레임마다 원본 (w, h)가 다르므로, 화면에 그릴 크기도 프레임마다 따로 계산한다.
+    draw_sizes = []
+    for (_, _, w, h) in rects:
+        scale = target_height / h
+        draw_sizes.append((round(w * scale), round(h * scale)))
+
     frame_index = 0
     for _ in range(200):  # 임시로 200틱만 재생하고 종료 (무한 재생은 다음 단계에서)
         left, bottom, w, h = rects[frame_index]
+        draw_w, draw_h = draw_sizes[frame_index]
 
         clear_canvas()
-        sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2)
+        sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2, draw_w, draw_h)
         update_canvas()
         delay(0.1)
 
