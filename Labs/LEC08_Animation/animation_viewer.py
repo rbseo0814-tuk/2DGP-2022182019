@@ -1,8 +1,8 @@
 """
 Drill #8. 애니메이션 뷰어
 
-2단계: 스프라이트 시트와 매니페스트(JSON)를 불러와서,
-       그 중 한 프레임만 화면에 정적으로 그려서 좌표 변환이 맞는지 확인한다.
+3단계: walk 애니메이션의 프레임을 순서대로 계속 바꿔가며 재생해본다.
+       (아직 확대·중앙정렬·반복횟수 제한은 없음 - 뼈대만 확인)
 """
 import json
 from pathlib import Path
@@ -40,14 +40,19 @@ def main():
     manifest = load_manifest()
     sheet_h = manifest["sheet_size"][1]
 
-    # 확인용: walk 애니메이션의 첫 번째 프레임 하나만 그려본다.
-    first_frame = manifest["animations"]["walk"][0]
-    left, bottom, w, h = to_pico_rect(first_frame, sheet_h)
+    walk_frames = manifest["animations"]["walk"]
+    rects = [to_pico_rect(f, sheet_h) for f in walk_frames]
 
-    clear_canvas()
-    sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2)
-    update_canvas()
-    delay(3)
+    frame_index = 0
+    for _ in range(200):  # 임시로 200틱만 재생하고 종료 (무한 재생은 다음 단계에서)
+        left, bottom, w, h = rects[frame_index]
+
+        clear_canvas()
+        sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2)
+        update_canvas()
+        delay(0.1)
+
+        frame_index = (frame_index + 1) % len(rects)
 
     close_canvas()
 
