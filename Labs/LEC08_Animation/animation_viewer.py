@@ -1,8 +1,11 @@
 """
 Drill #8. 애니메이션 뷰어
 
-9단계: 지금 어떤 동작이 재생 중인지 화면 좌상단에 글자로 표시한다.
-       (채점/시연할 때 어떤 애니메이션인지 바로 알아볼 수 있도록)
+10단계: clip_draw(..., x, y)는 프레임의 '중심'을 (x, y)에 맞춘다.
+        그런데 jump 애니메이션처럼 프레임마다 높이가 크게 다르면, 중심을
+        맞출 때 발 위치가 위아래로 흔들려 보인다(웅크릴수록 발이 뜸).
+        대신 '바닥선(baseline)'을 고정하고 그 위에 발이 닿도록 그리면
+        캐릭터가 제자리에 서 있는 것처럼 자연스럽다.
 """
 import json
 from itertools import cycle
@@ -90,9 +93,15 @@ class Animation:
             if self.timer >= self.pause_time:
                 self.finished = True
 
-    def draw(self, image, cx, cy):
+    def draw(self, image, cx, baseline_y):
+        """
+        cx: 가로 중심. baseline_y: 발이 닿는 바닥선(세로 기준점).
+        clip_draw는 (x, y)를 사각형의 '중심'으로 쓰므로, 발이 baseline_y에
+        오도록 하려면 그 프레임의 표시 높이 절반만큼 위로 올려서 중심을 잡는다.
+        """
         left, bottom, w, h = self.rects[self.frame_index]
         draw_w, draw_h = self.draw_sizes[self.frame_index]
+        cy = baseline_y + draw_h / 2
         image.clip_draw(left, bottom, w, h, cx, cy, draw_w, draw_h)
 
 
@@ -124,6 +133,9 @@ def main():
     current_name = next(anim_cycle)
     current = make_animation(current_name)
 
+    # 가장 큰 프레임(target_height)이 화면 세로 중앙에 오도록 바닥선을 고정한다.
+    baseline_y = CANVAS_H // 2 - target_height / 2
+
     running = True
     while running:
         running = handle_events()
@@ -134,7 +146,7 @@ def main():
             current = make_animation(current_name)
 
         clear_canvas()
-        current.draw(sheet, CANVAS_W // 2, CANVAS_H // 2)
+        current.draw(sheet, CANVAS_W // 2, baseline_y)
         font.draw(20, CANVAS_H - 36, f"현재 동작: {LABEL_TEXT[current_name]}", (20, 20, 20))
         update_canvas()
         delay(0.01)
