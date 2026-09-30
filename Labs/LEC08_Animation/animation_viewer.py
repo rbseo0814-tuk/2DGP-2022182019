@@ -38,12 +38,23 @@ MANIFEST_PATH = BASE_DIR / "samurai_manifest.json"
 
 CANVAS_W, CANVAS_H = 960, 640
 TARGET_HEIGHT_RATIO = 0.5  # 캐릭터 표시 높이 = 화면 세로 * 이 값
-FRAME_TIME = 0.09          # 한 프레임을 보여주는 시간(초)
+FRAME_TIME = 0.09          # 기본 프레임 재생 시간(초) - 아래 표에 없는 동작에 쓰는 기본값
 LOOP_REPEAT = 5            # 한 애니메이션을 몇 번 반복한 뒤 쉴지
 PAUSE_TIME = 1.0           # 반복 후 정지 시간(초)
 
 # 최소 4종 요구사항: 걷기/뛰기/구르기(점프)/공격 순서로 무한 반복한다.
 ANIM_ORDER = ["walk", "run", "jump", "attack"]
+
+# 동작마다 자연스러운 체감 속도가 다르다(조교 공지: "너무 빠르거나 느리지
+# 않도록 자연스러운 속도로 설정"). 프레임 개수가 다르므로 FRAME_TIME도
+# 동작별로 따로 맞춘다 - 걷기/달리기는 발걸음이 보일 정도로 느긋하게,
+# 구르기·공격은 순간 동작이라 더 빠르게 넘긴다.
+FRAME_TIME_BY_ANIM = {
+    "walk": 0.10,
+    "run": 0.07,
+    "jump": 0.06,
+    "attack": 0.045,
+}
 
 FONT_PATH = "C:/Windows/Fonts/malgun.ttf"
 LABEL_TEXT = {
@@ -147,7 +158,9 @@ def main():
     anim_cycle = cycle(order)
 
     def make_animation(name):
-        return Animation(manifest["animations"][name], sheet_h, target_height)
+        frame_time = FRAME_TIME_BY_ANIM.get(name, FRAME_TIME)
+        return Animation(manifest["animations"][name], sheet_h, target_height,
+                          frame_time=frame_time)
 
     current_name = next(anim_cycle)
     current = make_animation(current_name)
