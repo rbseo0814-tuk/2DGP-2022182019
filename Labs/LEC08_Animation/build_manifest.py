@@ -32,6 +32,13 @@ def find_bands(has_content):
     return bands
 
 
+def find_frames_in_row(content, y0, y1):
+    """한 행(row) 안에서 가로 방향으로 내용이 있는 구간 = 개별 프레임들을 찾는다."""
+    row_slice = content[y0:y1, :]
+    col_has_content = row_slice.any(axis=0)
+    return find_bands(col_has_content)
+
+
 def main():
     image = Image.open(SHEET_PATH).convert("RGBA")
     alpha = np.array(image)[:, :, 3]
@@ -43,7 +50,10 @@ def main():
     print(f"시트 크기: {image.size}")
     print(f"감지된 행(애니메이션) 개수: {len(row_bands)}")
     for i, (y0, y1) in enumerate(row_bands):
-        print(f"  row {i}: y=({y0},{y1})  height={y1 - y0}")
+        frames = find_frames_in_row(content, y0, y1)
+        widths = [x1 - x0 for x0, x1 in frames]
+        print(f"  row {i}: y=({y0},{y1}) height={y1 - y0}  "
+              f"프레임 수={len(frames)}  가로폭들={widths}")
 
 
 if __name__ == "__main__":
