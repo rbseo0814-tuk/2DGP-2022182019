@@ -39,6 +39,8 @@ while running:
     running = handle_events()
 
     clear_canvas()
+    # 좌표 확인용: 시트 전체를 원본 크기로 화면 중앙에 그린다.
+    sheet.draw(CANVAS_W // 2, CANVAS_H // 2)
     update_canvas()
     delay(FRAME_DELAY)
 
