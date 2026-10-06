@@ -13,6 +13,7 @@ FRAME_TIME = 0.12            # 애니메이션 프레임 하나를 보여주는 
 TARGET_HEIGHT_RATIO = 0.5    # 동작의 가장 큰 프레임이 화면 높이에서 차지할 비율
 BASELINE_Y = 150             # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
 REPEAT_COUNT = 5             # 동작 하나를 반복 재생하는 횟수
+REST_TIME = 1.0              # 반복을 마친 뒤 다음 동작까지 쉬는 시간(초)
 
 # 어느 디렉터리에서 실행하든 스크립트 옆의 이미지를 찾도록 절대 경로로 만든다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +31,8 @@ ACTIONS = [
         (87, 447, 29, 39), (118, 447, 30, 38), (150, 447, 30, 38),
         (182, 447, 30, 39),
     ]),
+    ("Look Up", [(212, 447, 28, 39), (240, 447, 29, 39)]),
+    ("Duck", [(270, 448, 24, 32), (302, 448, 29, 26)]),
 ]
 
 
@@ -82,6 +85,7 @@ class AnimationPlayer:
         self.frame_timer = 0.0
         self.play_count = 0          # 현재 동작을 끝까지 재생한 횟수
         self.resting = False         # REPEAT_COUNT회 재생을 마치고 쉬는 중인지
+        self.rest_timer = 0.0
         self._prepare_action()
 
     def _prepare_action(self):
@@ -92,6 +96,9 @@ class AnimationPlayer:
 
     def update(self, dt):
         if self.resting:
+            self.rest_timer += dt
+            if self.rest_timer >= REST_TIME:
+                self._next_action()
             return
 
         # 경과 시간만큼 타이머를 채우고, FRAME_TIME이 찰 때마다 다음 프레임으로 넘긴다.
@@ -111,6 +118,17 @@ class AnimationPlayer:
             self.resting = True      # 쉬는 동안 마지막 프레임을 그대로 보여준다.
         else:
             self.frame = 0
+
+    def _next_action(self):
+        if self.action_index + 1 >= len(self.actions):
+            return                   # 아직 마지막 동작 이후 처리는 없다.
+        self.action_index += 1
+        self.frame = 0
+        self.frame_timer = 0.0
+        self.play_count = 0
+        self.resting = False
+        self.rest_timer = 0.0
+        self._prepare_action()
 
     def draw(self, image):
         draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom)
