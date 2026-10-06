@@ -71,31 +71,54 @@ def handle_events():
     return True
 
 
-open_canvas(CANVAS_W, CANVAS_H)
-sheet = load_sprite_sheet()
+class AnimationPlayer:
+    """재생 상태(현재 동작, 프레임, 타이머)를 관리한다."""
 
-frames = ACTIONS[0][1]
-scale = compute_scale(frames)
-base_bottom = min(b for _, b, _, _ in frames)
-frame = 0
-frame_timer = 0.0
-prev_time = get_time()
+    def __init__(self, actions):
+        self.actions = actions
+        self.action_index = 0
+        self.frame = 0
+        self.frame_timer = 0.0
+        self._prepare_action()
 
-running = True
-while running:
-    running = handle_events()
+    def _prepare_action(self):
+        _, frames = self.actions[self.action_index]
+        self.frames = frames
+        self.scale = compute_scale(frames)
+        self.base_bottom = min(b for _, b, _, _ in frames)
 
-    # 경과 시간만큼 타이머를 채우고, FRAME_TIME이 찰 때마다 다음 프레임으로 넘긴다.
-    now = get_time()
-    frame_timer += now - prev_time
-    prev_time = now
-    while frame_timer >= FRAME_TIME:
-        frame_timer -= FRAME_TIME
-        frame = (frame + 1) % len(frames)
+    def update(self, dt):
+        # 경과 시간만큼 타이머를 채우고, FRAME_TIME이 찰 때마다 다음 프레임으로 넘긴다.
+        self.frame_timer += dt
+        while self.frame_timer >= FRAME_TIME:
+            self.frame_timer -= FRAME_TIME
+            self.frame = (self.frame + 1) % len(self.frames)
 
-    clear_canvas()
-    draw_frame(sheet, frames[frame], scale, base_bottom)
-    update_canvas()
-    delay(FRAME_DELAY)
+    def draw(self, image):
+        draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom)
 
-close_canvas()
+
+def main():
+    open_canvas(CANVAS_W, CANVAS_H)
+    sheet = load_sprite_sheet()
+    player = AnimationPlayer(ACTIONS)
+
+    prev_time = get_time()
+    running = True
+    while running:
+        running = handle_events()
+
+        now = get_time()
+        player.update(now - prev_time)
+        prev_time = now
+
+        clear_canvas()
+        player.draw(sheet)
+        update_canvas()
+        delay(FRAME_DELAY)
+
+    close_canvas()
+
+
+if __name__ == "__main__":
+    main()
