@@ -12,6 +12,7 @@ FRAME_DELAY = 0.01           # 메인 루프 한 바퀴마다 쉬는 시간(초)
 FRAME_TIME = 0.12            # 애니메이션 프레임 하나를 보여주는 시간(초)
 TARGET_HEIGHT_RATIO = 0.5    # 동작의 가장 큰 프레임이 화면 높이에서 차지할 비율
 BASELINE_Y = 150             # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
+REPEAT_COUNT = 5             # 동작 하나를 반복 재생하는 횟수
 
 # 어느 디렉터리에서 실행하든 스크립트 옆의 이미지를 찾도록 절대 경로로 만든다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -72,13 +73,15 @@ def handle_events():
 
 
 class AnimationPlayer:
-    """재생 상태(현재 동작, 프레임, 타이머)를 관리한다."""
+    """재생 상태(현재 동작, 프레임, 반복 횟수, 타이머)를 관리한다."""
 
     def __init__(self, actions):
         self.actions = actions
         self.action_index = 0
         self.frame = 0
         self.frame_timer = 0.0
+        self.play_count = 0          # 현재 동작을 끝까지 재생한 횟수
+        self.resting = False         # REPEAT_COUNT회 재생을 마치고 쉬는 중인지
         self._prepare_action()
 
     def _prepare_action(self):
@@ -88,11 +91,26 @@ class AnimationPlayer:
         self.base_bottom = min(b for _, b, _, _ in frames)
 
     def update(self, dt):
+        if self.resting:
+            return
+
         # 경과 시간만큼 타이머를 채우고, FRAME_TIME이 찰 때마다 다음 프레임으로 넘긴다.
         self.frame_timer += dt
-        while self.frame_timer >= FRAME_TIME:
+        while self.frame_timer >= FRAME_TIME and not self.resting:
             self.frame_timer -= FRAME_TIME
-            self.frame = (self.frame + 1) % len(self.frames)
+            self._advance_frame()
+
+    def _advance_frame(self):
+        if self.frame < len(self.frames) - 1:
+            self.frame += 1
+            return
+
+        # 마지막 프레임까지 보여줬으면 1회 재생 완료.
+        self.play_count += 1
+        if self.play_count >= REPEAT_COUNT:
+            self.resting = True      # 쉬는 동안 마지막 프레임을 그대로 보여준다.
+        else:
+            self.frame = 0
 
     def draw(self, image):
         draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom)
