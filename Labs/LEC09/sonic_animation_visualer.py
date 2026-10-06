@@ -1,6 +1,7 @@
 import os
 import sys
 
+import pico2d
 from pico2d import *
 
 
@@ -18,6 +19,10 @@ REST_TIME = 1.0              # 반복을 마친 뒤 다음 동작까지 쉬는 �
 # 어느 디렉터리에서 실행하든 스크립트 옆의 이미지를 찾도록 절대 경로로 만든다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SPRITE_PATH = os.path.join(BASE_DIR, "sonic-sprite.png")
+# OS마다 폰트 경로가 다르므로 pico2d 패키지에 함께 들어 있는 폰트를 쓴다.
+FONT_PATH = os.path.join(os.path.dirname(pico2d.__file__), "data", "ConsolaMalgun.ttf")
+FONT_SIZE = 24
+TEXT_COLOR = (20, 20, 20)
 
 
 # ---------------------------------------------------------------------------
@@ -184,10 +189,21 @@ class AnimationPlayer:
     def draw(self, image):
         draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom)
 
+    def draw_info(self, font):
+        name = self.actions[self.action_index][0]
+        loop = min(self.play_count + 1, REPEAT_COUNT)    # 지금 몇 번째 재생 중인지
+        status = "REST" if self.resting else "PLAY"
+        x, y = 20, CANVAS_H - 30
+        font.draw(x, y, f"{name}", TEXT_COLOR)
+        font.draw(x, y - 32, f"{loop} / {REPEAT_COUNT}  {status}", TEXT_COLOR)
+        font.draw(x, y - 64,
+                  f"action {self.action_index + 1} / {len(self.actions)}", TEXT_COLOR)
+
 
 def main():
     open_canvas(CANVAS_W, CANVAS_H)
     sheet = load_sprite_sheet()
+    font = load_font(FONT_PATH, FONT_SIZE)
     player = AnimationPlayer(ACTIONS)
 
     prev_time = get_time()
@@ -201,6 +217,7 @@ def main():
 
         clear_canvas()
         player.draw(sheet)
+        player.draw_info(font)
         update_canvas()
         delay(FRAME_DELAY)
 
