@@ -23,6 +23,8 @@ SPRITE_PATH = os.path.join(BASE_DIR, "sonic-sprite.png")
 FONT_PATH = os.path.join(os.path.dirname(pico2d.__file__), "data", "ConsolaMalgun.ttf")
 FONT_SIZE = 24
 TEXT_COLOR = (20, 20, 20)
+BG_COLOR = (240, 244, 252)       # 파란 소닉이 잘 보이는 밝은 배경색
+GROUND_COLOR = (190, 198, 215)   # 바닥선 색
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +123,13 @@ def draw_frame(image, rect, scale, base_bottom):
     image.clip_draw(left, bottom, w, h, CANVAS_W / 2, y, draw_w, draw_h)
 
 
+def draw_background():
+    """격자 없는 단색 배경과 캐릭터가 서 있는 바닥선을 그린다."""
+    draw_rectangle(0, 0, CANVAS_W - 1, CANVAS_H - 1, *BG_COLOR, filled=True)
+    draw_rectangle(0, BASELINE_Y - 4, CANVAS_W - 1, BASELINE_Y - 1,
+                   *GROUND_COLOR, filled=True)
+
+
 def handle_events():
     """창 닫기 버튼이나 ESC 키가 눌리면 False를 돌려준다."""
     for event in get_events():
@@ -202,6 +211,7 @@ class AnimationPlayer:
 
 def main():
     open_canvas(CANVAS_W, CANVAS_H)
+    hide_lattice()
     sheet = load_sprite_sheet()
     font = load_font(FONT_PATH, FONT_SIZE)
     player = AnimationPlayer(ACTIONS)
@@ -216,6 +226,7 @@ def main():
         prev_time = now
 
         clear_canvas()
+        draw_background()
         player.draw(sheet)
         player.draw_info(font)
         update_canvas()
