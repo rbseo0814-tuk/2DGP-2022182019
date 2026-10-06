@@ -186,6 +186,8 @@ class AnimationPlayer:
         self.scale = compute_scale(frames)
         self.base_bottom = min(b for _, b, _, _ in frames)
         self.move_speed = MOVE_SPEED.get(self.actions[self.action_index][0], 0)
+        # 화면 순환 판정에 쓰는, 이 동작에서 가장 넓은 프레임의 화면상 절반 너비
+        self.half_w = max(w for _, _, w, _ in frames) * self.scale / 2
 
     def update(self, dt):
         if self.resting:
@@ -196,6 +198,9 @@ class AnimationPlayer:
 
         # 이동 동작이면 경과 시간에 비례해 오른쪽으로 이동한다.
         self.x += self.move_speed * dt
+        if self.x - self.half_w > CANVAS_W:
+            # 오른쪽 밖으로 완전히 나가면 왼쪽 밖에서 다시 들어온다.
+            self.x = -self.half_w
 
         # 경과 시간만큼 타이머를 채우고, frame_time이 찰 때마다 다음 프레임으로 넘긴다.
         self.frame_timer += dt
