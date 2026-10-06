@@ -1,3 +1,17 @@
+"""소닉 애니메이션 뷰어 (LEC09)
+
+sonic-sprite.png 에 있는 소닉의 모든 동작(17종, 76프레임)을 순서대로 재생한다.
+
+- 각 동작을 REPEAT_COUNT(5)회 반복 재생하고 REST_TIME(1초) 동안 쉰 뒤 다음 동작으로 넘어간다.
+- 마지막 동작이 끝나면 첫 동작으로 돌아가 무한 반복한다.
+- 동작마다 정수 배율 하나로 확대하고(화면 높이의 약 50%), 바닥선을 고정해
+  프레임 크기가 달라도 캐릭터가 출렁이거나 흔들리지 않게 그린다.
+- 프레임 전환과 정지 시간은 경과 시간 기준이라 실행 환경의 속도와 무관하다.
+- 창 닫기 버튼이나 ESC 키로 종료한다.
+
+실행: python sonic_animation_visualer.py  (어느 디렉터리에서 실행해도 된다)
+요구사항 문서: PRD.md
+"""
 import os
 import sys
 
@@ -12,7 +26,7 @@ CANVAS_W, CANVAS_H = 800, 600
 FRAME_DELAY = 0.01           # 메인 루프 한 바퀴마다 쉬는 시간(초)
 TARGET_HEIGHT_RATIO = 0.5    # 동작의 가장 큰 프레임이 화면 높이에서 차지할 비율
 MAX_WIDTH_RATIO = 0.9        # 가장 넓은 프레임이 화면 너비에서 차지할 최대 비율
-BASELINE_Y = 150            # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
+BASELINE_Y = 150             # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
 REPEAT_COUNT = 5             # 동작 하나를 반복 재생하는 횟수
 REST_TIME = 1.0              # 반복을 마친 뒤 다음 동작까지 쉬는 시간(초)
 
@@ -91,6 +105,7 @@ ACTIONS = [
 
 
 def load_sprite_sheet():
+    """스프라이트 시트를 읽는다. 파일이 없으면 경로를 알려 주고 종료한다."""
     if not os.path.isfile(SPRITE_PATH):
         sys.exit(f"스프라이트 이미지를 찾을 수 없습니다: {SPRITE_PATH}")
     return load_image(SPRITE_PATH)
@@ -199,6 +214,7 @@ class AnimationPlayer:
         draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom)
 
     def draw_info(self, font):
+        """화면 좌상단에 동작 이름, 반복 횟수, 재생/정지 상태를 표시한다."""
         name = self.actions[self.action_index][0]
         loop = min(self.play_count + 1, REPEAT_COUNT)    # 지금 몇 번째 재생 중인지
         status = "REST" if self.resting else "PLAY"
