@@ -10,6 +10,7 @@ from pico2d import *
 CANVAS_W, CANVAS_H = 800, 600
 FRAME_DELAY = 0.01           # 메인 루프 한 바퀴마다 쉬는 시간(초)
 FRAME_TIME = 0.12            # 애니메이션 프레임 하나를 보여주는 시간(초)
+TARGET_HEIGHT_RATIO = 0.5    # 동작의 가장 큰 프레임이 화면 높이에서 차지할 비율
 
 # 어느 디렉터리에서 실행하든 스크립트 옆의 이미지를 찾도록 절대 경로로 만든다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -36,6 +37,16 @@ def load_sprite_sheet():
     return load_image(SPRITE_PATH)
 
 
+def compute_scale(frames):
+    """동작 하나에 쓸 정수 확대 배율.
+
+    프레임마다 배율이 바뀌면 캐릭터 크기가 출렁이므로 동작 단위로 한 번만 정한다.
+    정수 배율이라 픽셀 아트가 흐려지지 않는다.
+    """
+    max_h = max(h for _, _, _, h in frames)
+    return max(1, int(CANVAS_H * TARGET_HEIGHT_RATIO) // max_h)
+
+
 def handle_events():
     """창 닫기 버튼이나 ESC 키가 눌리면 False를 돌려준다."""
     for event in get_events():
@@ -50,6 +61,7 @@ open_canvas(CANVAS_W, CANVAS_H)
 sheet = load_sprite_sheet()
 
 frames = ACTIONS[0][1]
+scale = compute_scale(frames)
 frame = 0
 frame_timer = 0.0
 prev_time = get_time()
@@ -68,7 +80,8 @@ while running:
 
     clear_canvas()
     left, bottom, w, h = frames[frame]
-    sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2)
+    sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2,
+                    w * scale, h * scale)
     update_canvas()
     delay(FRAME_DELAY)
 
