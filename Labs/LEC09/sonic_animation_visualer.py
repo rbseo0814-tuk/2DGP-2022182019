@@ -135,8 +135,8 @@ def compute_scale(frames):
     return max(1, min(by_height, by_width))
 
 
-def draw_frame(image, rect, scale, base_bottom):
-    """프레임을 가로 중앙, 바닥선 기준으로 확대해서 그린다.
+def draw_frame(image, rect, scale, base_bottom, x):
+    """프레임을 가로 위치 x(중심), 바닥선 기준으로 확대해서 그린다.
 
     시트에서 같은 동작의 프레임들은 같은 지면 위에 놓여 있으므로,
     가장 낮은 프레임(base_bottom)과의 높이 차이를 그대로 유지해 그리면
@@ -145,7 +145,7 @@ def draw_frame(image, rect, scale, base_bottom):
     left, bottom, w, h = rect
     draw_w, draw_h = w * scale, h * scale
     y = BASELINE_Y + (bottom - base_bottom) * scale + draw_h / 2
-    image.clip_draw(left, bottom, w, h, CANVAS_W / 2, y, draw_w, draw_h)
+    image.clip_draw(left, bottom, w, h, x, y, draw_w, draw_h)
 
 
 def draw_background():
@@ -166,7 +166,7 @@ def handle_events():
 
 
 class AnimationPlayer:
-    """재생 상태(현재 동작, 프레임, 반복 횟수, 타이머)를 관리한다."""
+    """재생 상태(현재 동작, 프레임, 반복 횟수, 타이머, 가로 위치)를 관리한다."""
 
     def __init__(self, actions):
         self.actions = actions
@@ -176,6 +176,7 @@ class AnimationPlayer:
         self.play_count = 0          # 현재 동작을 끝까지 재생한 횟수
         self.resting = False         # REPEAT_COUNT회 재생을 마치고 쉬는 중인지
         self.rest_timer = 0.0
+        self.x = CANVAS_W / 2        # 캐릭터 중심의 화면 x 좌표
         self._prepare_action()
 
     def _prepare_action(self):
@@ -184,6 +185,7 @@ class AnimationPlayer:
         self.frames = frames
         self.scale = compute_scale(frames)
         self.base_bottom = min(b for _, b, _, _ in frames)
+        self.move_speed = MOVE_SPEED.get(self.actions[self.action_index][0], 0)
 
     def update(self, dt):
         if self.resting:
@@ -191,6 +193,9 @@ class AnimationPlayer:
             if self.rest_timer >= REST_TIME:
                 self._next_action()
             return
+
+        # 이동 동작이면 경과 시간에 비례해 오른쪽으로 이동한다.
+        self.x += self.move_speed * dt
 
         # 경과 시간만큼 타이머를 채우고, frame_time이 찰 때마다 다음 프레임으로 넘긴다.
         self.frame_timer += dt
@@ -221,7 +226,8 @@ class AnimationPlayer:
         self._prepare_action()
 
     def draw(self, image):
-        draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom)
+        draw_frame(image, self.frames[self.frame], self.scale, self.base_bottom,
+                   self.x)
 
     def draw_info(self, font):
         """화면 좌상단에 동작 이름, 반복 횟수, 재생/정지 상태를 표시한다."""
