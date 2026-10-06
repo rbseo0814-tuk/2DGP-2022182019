@@ -120,9 +120,8 @@ class AnimationPlayer:
             self.frame = 0
 
     def _next_action(self):
-        if self.action_index + 1 >= len(self.actions):
-            return                   # 아직 마지막 동작 이후 처리는 없다.
-        self.action_index += 1
+        # 마지막 동작 다음에는 첫 동작으로 돌아가 무한 반복한다.
+        self.action_index = (self.action_index + 1) % len(self.actions)
         self.frame = 0
         self.frame_timer = 0.0
         self.play_count = 0
