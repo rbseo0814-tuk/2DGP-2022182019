@@ -48,14 +48,19 @@ def handle_events():
 open_canvas(CANVAS_W, CANVAS_H)
 sheet = load_sprite_sheet()
 
+frames = ACTIONS[0][1]
+frame = 0
+
 running = True
 while running:
     running = handle_events()
 
     clear_canvas()
-    left, bottom, w, h = ACTIONS[0][1][0]
+    left, bottom, w, h = frames[frame]
     sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2)
     update_canvas()
-    delay(FRAME_DELAY)
+
+    frame = (frame + 1) % len(frames)
+    delay(0.1)
 
 close_canvas()
