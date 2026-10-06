@@ -176,7 +176,6 @@ class AnimationPlayer:
         self.play_count = 0          # 현재 동작을 끝까지 재생한 횟수
         self.resting = False         # REPEAT_COUNT회 재생을 마치고 쉬는 중인지
         self.rest_timer = 0.0
-        self.x = CANVAS_W / 2        # 캐릭터 중심의 화면 x 좌표
         self._prepare_action()
 
     def _prepare_action(self):
@@ -188,6 +187,9 @@ class AnimationPlayer:
         self.move_speed = MOVE_SPEED.get(self.actions[self.action_index][0], 0)
         # 화면 순환 판정에 쓰는, 이 동작에서 가장 넓은 프레임의 화면상 절반 너비
         self.half_w = max(w for _, _, w, _ in frames) * self.scale / 2
+        # 캐릭터 중심의 화면 x 좌표. 제자리 동작은 중앙에서, 이동 동작은 왼쪽 밖에서
+        # 출발한다(5회 이동 후 쉬는 위치가 화면 안에 들어오도록).
+        self.x = -self.half_w if self.move_speed else CANVAS_W / 2
 
     def update(self, dt):
         if self.resting:
@@ -239,6 +241,8 @@ class AnimationPlayer:
         name = self.actions[self.action_index][0]
         loop = min(self.play_count + 1, REPEAT_COUNT)    # 지금 몇 번째 재생 중인지
         status = "REST" if self.resting else "PLAY"
+        if self.move_speed:
+            status += f"  move {self.move_speed} px/s"
         x, y = 20, CANVAS_H - 30
         font.draw(x, y, f"{name}", TEXT_COLOR)
         font.draw(x, y - 32, f"{loop} / {REPEAT_COUNT}  {status}", TEXT_COLOR)
