@@ -11,6 +11,7 @@ CANVAS_W, CANVAS_H = 800, 600
 FRAME_DELAY = 0.01           # 메인 루프 한 바퀴마다 쉬는 시간(초)
 FRAME_TIME = 0.12            # 애니메이션 프레임 하나를 보여주는 시간(초)
 TARGET_HEIGHT_RATIO = 0.5    # 동작의 가장 큰 프레임이 화면 높이에서 차지할 비율
+BASELINE_Y = 150             # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
 
 # 어느 디렉터리에서 실행하든 스크립트 옆의 이미지를 찾도록 절대 경로로 만든다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -47,6 +48,19 @@ def compute_scale(frames):
     return max(1, int(CANVAS_H * TARGET_HEIGHT_RATIO) // max_h)
 
 
+def draw_frame(image, rect, scale, base_bottom):
+    """프레임을 가로 중앙, 바닥선 기준으로 확대해서 그린다.
+
+    시트에서 같은 동작의 프레임들은 같은 지면 위에 놓여 있으므로,
+    가장 낮은 프레임(base_bottom)과의 높이 차이를 그대로 유지해 그리면
+    프레임 높이가 달라도 발 위치가 흔들리지 않는다.
+    """
+    left, bottom, w, h = rect
+    draw_w, draw_h = w * scale, h * scale
+    y = BASELINE_Y + (bottom - base_bottom) * scale + draw_h / 2
+    image.clip_draw(left, bottom, w, h, CANVAS_W / 2, y, draw_w, draw_h)
+
+
 def handle_events():
     """창 닫기 버튼이나 ESC 키가 눌리면 False를 돌려준다."""
     for event in get_events():
@@ -62,6 +76,7 @@ sheet = load_sprite_sheet()
 
 frames = ACTIONS[0][1]
 scale = compute_scale(frames)
+base_bottom = min(b for _, b, _, _ in frames)
 frame = 0
 frame_timer = 0.0
 prev_time = get_time()
@@ -79,9 +94,7 @@ while running:
         frame = (frame + 1) % len(frames)
 
     clear_canvas()
-    left, bottom, w, h = frames[frame]
-    sheet.clip_draw(left, bottom, w, h, CANVAS_W // 2, CANVAS_H // 2,
-                    w * scale, h * scale)
+    draw_frame(sheet, frames[frame], scale, base_bottom)
     update_canvas()
     delay(FRAME_DELAY)
 
