@@ -11,7 +11,8 @@ CANVAS_W, CANVAS_H = 800, 600
 FRAME_DELAY = 0.01           # 메인 루프 한 바퀴마다 쉬는 시간(초)
 FRAME_TIME = 0.12            # 애니메이션 프레임 하나를 보여주는 시간(초)
 TARGET_HEIGHT_RATIO = 0.5    # 동작의 가장 큰 프레임이 화면 높이에서 차지할 비율
-BASELINE_Y = 150             # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
+MAX_WIDTH_RATIO = 0.9        # 가장 넓은 프레임이 화면 너비에서 차지할 최대 비율
+BASELINE_Y = 150            # 캐릭터 발(바닥선)이 놓일 화면 y 좌표
 REPEAT_COUNT = 5             # 동작 하나를 반복 재생하는 횟수
 REST_TIME = 1.0              # 반복을 마친 뒤 다음 동작까지 쉬는 시간(초)
 
@@ -94,8 +95,12 @@ def compute_scale(frames):
     프레임마다 배율이 바뀌면 캐릭터 크기가 출렁이므로 동작 단위로 한 번만 정한다.
     정수 배율이라 픽셀 아트가 흐려지지 않는다.
     """
+    max_w = max(w for _, _, w, _ in frames)
     max_h = max(h for _, _, _, h in frames)
-    return max(1, int(CANVAS_H * TARGET_HEIGHT_RATIO) // max_h)
+    by_height = int(CANVAS_H * TARGET_HEIGHT_RATIO) // max_h
+    # 가장 넓은 프레임도 화면 가로를 벗어나지 않도록 상한을 둔다.
+    by_width = int(CANVAS_W * MAX_WIDTH_RATIO) // max_w
+    return max(1, min(by_height, by_width))
 
 
 def draw_frame(image, rect, scale, base_bottom):
